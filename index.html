@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tutorial Interativo: Pipelining de Talentos na Gupy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Harmony Neutrals -->
+    <!-- Application Structure Plan: A task-oriented, tab-based single-page application. The structure guides the user through the recruitment workflow: 1. Foundations (Strategy), 2. Find Talents (Interactive Search), 3. Manage Lists (Process), 4. Assign to Jobs (Core Action). This is more intuitive than the report's linear chapter structure. The key interaction is a Boolean Search Simulator, turning passive reading into active learning. A comparative chart visualizes the critical difference between assignment types, enhancing comprehension. -->
+    <!-- Visualization & Content Choices: 1. Boolean Search Simulator (Goal: Teach complex search) -> Interactive HTML/JS buttons to build a query, showing real-time results and explanations. Justification: Makes abstract concepts tangible. 2. Assignment Comparison Chart (Goal: Compare actions) -> Chart.js Horizontal Bar Chart. Justification: Visually superior to a static table for comparing attributes like 'Notification Sent'. 3. Process Flows (Goal: Explain steps) -> Styled HTML/CSS lists. Justification: Clear, simple, and effective. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .tab-button.active {
+            border-color: #0d9488; /* teal-600 */
+            background-color: #ccfbf1; /* teal-50 */
+            color: #115e59; /* teal-800 */
+            font-weight: 600;
+        }
+        .boolean-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .boolean-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-stone-50 text-slate-800">
+
+    <div class="container mx-auto p-4 md:p-8">
+
+        <header class="text-center mb-8 md:mb-12">
+            <h1 class="text-3xl md:text-4xl font-bold text-teal-800 mb-2">Listas Segmentadas na Gupy</h1>
+            <p class="text-lg text-slate-600 max-w-3xl mx-auto">Domine a arte de encontrar e atribuir talentos de forma proativa.</p>
+        </header>
+
+        <nav class="mb-8 border-b border-slate-200">
+            <ul class="flex flex-wrap -mb-px justify-center text-sm font-medium text-center" id="main-tabs">
+                <li class="mr-2">
+                    <button class="tab-button inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-teal-600 hover:border-teal-300" data-tab="fundamentos">
+                        ① Fundamentos
+                    </button>
+                </li>
+                <li class="mr-2">
+                    <button class="tab-button inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-teal-600 hover:border-teal-300" data-tab="encontrar">
+                        ② Encontrar Talentos
+                    </button>
+                </li>
+                <li class="mr-2">
+                    <button class="tab-button inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-teal-600 hover:border-teal-300" data-tab="gerenciar">
+                        ③ Criar & Gerenciar Listas
+                    </button>
+                </li>
+                <li>
+                    <button class="tab-button inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-teal-600 hover:border-teal-300" data-tab="atribuir">
+                        ④ Atribuir a Vagas
+                    </button>
+                </li>
+            </ul>
+        </nav>
+
+        <main id="tab-content">
+            <section id="fundamentos" class="content-section active">
+                 <div class="bg-white p-6 md:p-8 rounded-xl shadow-sm">
+                    <h2 class="text-2xl font-bold text-teal-700 mb-4">A Base Estratégica do Recrutamento Proativo</h2>
+                    <p class="text-slate-600 mb-6">Antes de clicar em qualquer botão, é crucial entender a mentalidade por trás do sucesso. O recrutamento moderno não é sobre esperar, é sobre caçar talentos e construir um pipeline robusto. Esta seção explica os dois conceitos essenciais que fundamentam todo o processo na Gupy, garantindo que cada ação seja intencional e alinhada com os objetivos de negócio.</p>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="border border-slate-200 rounded-lg p-6 bg-stone-50">
+                            <h3 class="font-bold text-xl mb-2 text-slate-800">🧠 A Mentalidade de "Hunting"</h3>
+                            <p class="text-slate-600">Mude sua perspectiva de um processador passivo de candidaturas para um "caçador" proativo. Seu banco de talentos não é um arquivo morto, mas um ecossistema vivo de potencial. O "hunting" envolve a busca ativa por profissionais qualificados neste ecossistema, muitos dos quais podem ser candidatos passivos ou que se engajaram com sua empresa no passado. Lembre-se sempre de operar em conformidade com a LGPD, garantindo o consentimento do candidato.</p>
+                        </div>
+                        <div class="border border-slate-200 rounded-lg p-6 bg-stone-50">
+                            <h3 class="font-bold text-xl mb-2 text-slate-800">🎯 O Perfil de Candidato Ideal (PCI)</h3>
+                            <p class="text-slate-600">Uma busca eficaz começa com um alvo claro. O PCI vai além da descrição da vaga, detalhando as competências técnicas (hard skills), comportamentais (soft skills) e o fit cultural. Cada elemento do PCI deve ser traduzido em palavras-chave e filtros específicos para a busca na Gupy. Por exemplo, "experiência com gestão ágil" se traduz em buscas por `scrum`, `agile` ou `kanban`.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="encontrar" class="content-section">
+                <div class="bg-white p-6 md:p-8 rounded-xl shadow-sm">
+                    <h2 class="text-2xl font-bold text-teal-700 mb-4">Encontrando Talentos com Precisão</h2>
+                    <p class="text-slate-600 mb-6">Esta é a etapa prática de busca, onde a estratégia se transforma em ação. A Gupy oferece desde filtros simples até uma poderosa busca booleana. Explore as ferramentas interativas abaixo para aprender a segmentar seu banco de talentos com precisão cirúrgica e encontrar os perfis exatos que você precisa.</p>
+                    
+                    <div class="border border-slate-200 rounded-lg p-6 mb-6">
+                        <h3 class="font-bold text-xl mb-3 text-slate-800">Filtros Padrão: A Primeira Camada de Segmentação</h3>
+                         <p class="text-slate-600 mb-4">Use os filtros padrão para uma segmentação rápida e intuitiva. Eles são ideais para refinar sua busca com base em dados estruturados do perfil do candidato. Combine-os para obter resultados ainda mais específicos.</p>
+                        <div class="flex flex-wrap gap-4">
+                            <div class="flex-1 min-w-[200px] bg-stone-50 p-4 rounded-md border">
+                                <h4 class="font-semibold">🏷️ Tags</h4>
+                                <p class="text-sm text-slate-500">Crie e aplique tags personalizadas (`potencial_lideranca`, `aprovado_fit_cultural`) para categorizações que vão além do currículo.</p>
+                            </div>
+                            <div class="flex-1 min-w-[200px] bg-stone-50 p-4 rounded-md border">
+                                <h4 class="font-semibold">🌈 Gupy Diversidade</h4>
+                                <p class="text-sm text-slate-500">Filtre por marcadores de diversidade autodeclarados (PCD, Cor/Raça, Gênero) para criar listas para vagas afirmativas.</p>
+                            </div>
+                            <div class="flex-1 min-w-[200px] bg-stone-50 p-4 rounded-md border">
+                                <h4 class="font-semibold">🎓 Critérios Padrão</h4>
+                                <p class="text-sm text-slate-500">Utilize dados estruturados como Escolaridade, Curso, Localização e Idiomas para buscas específicas.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="border border-slate-200 rounded-lg p-6">
+                        <h3 class="font-bold text-xl mb-3 text-slate-800">Simulador de Busca Booleana Avançada</h3>
+                        <p class="text-slate-600 mb-4">Aprenda a "conversar" com o banco de dados. Clique nos operadores e campos para construir sua consulta e ver a mágica acontecer. Lembre-se: operadores (`AND`, `OR`, `NOT`) devem ser em maiúsculas.</p>
+                        
+                        <div class="bg-slate-900 text-white font-mono p-4 rounded-lg mb-4 text-sm md:text-base min-h-[50px]">
+                            <span id="query-display"></span><span id="cursor" class="animate-ping">|</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                            <div>
+                                <h4 class="font-semibold mb-2">Operadores Lógicos:</h4>
+                                <div class="flex flex-wrap gap-2">
+                                    <button class="boolean-btn bg-sky-500 text-white px-3 py-1 rounded-md" data-value=" AND ">AND</button>
+                                    <button class="boolean-btn bg-emerald-500 text-white px-3 py-1 rounded-md" data-value=" OR ">OR</button>
+                                    <button class="boolean-btn bg-red-500 text-white px-3 py-1 rounded-md" data-value=" NOT ">NOT</button>
+                                    <button class="boolean-btn bg-amber-500 text-white px-3 py-1 rounded-md" data-value='""'>"" (Frase)</button>
+                                    <button class="boolean-btn bg-purple-500 text-white px-3 py-1 rounded-md" data-value="()">() (Grupo)</button>
+                                </div>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold mb-2">Campos Específicos:</h4>
+                                <div class="flex flex-wrap gap-2">
+                                    <button class="boolean-btn bg-slate-500 text-white px-3 py-1 rounded-md" data-value="cargo:">cargo:</button>
+                                    <button class="boolean-btn bg-slate-500 text-white px-3 py-1 rounded-md" data-value="cidade:">cidade:</button>
+                                    <button class="boolean-btn bg-slate-500 text-white px-3 py-1 rounded-md" data-value="habilidade:">habilidade:</button>
+                                     <button class="boolean-btn bg-slate-500 text-white px-3 py-1 rounded-md" data-value="empresa:">empresa:</button>
+                                </div>
+                            </div>
+                            <div>
+                                 <h4 class="font-semibold mb-2">Termos de Exemplo:</h4>
+                                <div class="flex flex-wrap gap-2">
+                                    <button class="boolean-btn bg-gray-200 text-gray-800 px-3 py-1 rounded-md" data-value="desenvolvedor">desenvolvedor</button>
+                                    <button class="boolean-btn bg-gray-200 text-gray-800 px-3 py-1 rounded-md" data-value="python">python</button>
+                                    <button class="boolean-btn bg-gray-200 text-gray-800 px-3 py-1 rounded-md" data-value='"são paulo"'>"são paulo"</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <button id="clear-query" class="bg-gray-700 hover:bg-gray-800 text-white px-4 py-2 rounded-md text-sm">Limpar Busca</button>
+                        </div>
+
+                        <div id="query-explanation" class="mt-6 bg-teal-50 border-l-4 border-teal-500 text-teal-800 p-4 rounded-r-lg">
+                            <h4 class="font-bold">O que esta busca faz?</h4>
+                            <p id="explanation-text">Comece a construir sua busca clicando nos botões acima.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="gerenciar" class="content-section">
+                <div class="bg-white p-6 md:p-8 rounded-xl shadow-sm">
+                    <h2 class="text-2xl font-bold text-teal-700 mb-4">Criando e Gerenciando Suas Listas</h2>
+                    <p class="text-slate-600 mb-6">Após encontrar os talentos certos, o próximo passo é salvar sua busca como uma Lista Segmentada. Isso cria um atalho dinâmico para aquele grupo de perfis, pronto para uso futuro. Nesta seção, você aprenderá não apenas a criar essas listas, mas também a mantê-las organizadas para garantir a eficiência a longo prazo.</p>
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div>
+                            <h3 class="font-bold text-xl mb-3 text-slate-800">Processo de Criação da Lista</h3>
+                            <ol class="relative border-l border-slate-200">                  
+                                <li class="mb-10 ml-4">
+                                    <div class="absolute w-3 h-3 bg-slate-300 rounded-full mt-1.5 -left-1.5 border border-white"></div>
+                                    <h4 class="text-lg font-semibold text-slate-900">1. Execute a Busca</h4>
+                                    <p class="mb-4 text-base font-normal text-slate-500">Aplique os filtros e/ou a busca booleana para obter a lista de perfis desejada.</p>
+                                </li>
+                                <li class="mb-10 ml-4">
+                                    <div class="absolute w-3 h-3 bg-slate-300 rounded-full mt-1.5 -left-1.5 border border-white"></div>
+                                    <h4 class="text-lg font-semibold text-slate-900">2. Revise os Resultados</h4>
+                                    <p class="text-base font-normal text-slate-500">Analise os perfis retornados para garantir a relevância e a qualidade.</p>
+                                </li>
+                                <li class="ml-4">
+                                    <div class="absolute w-3 h-3 bg-slate-300 rounded-full mt-1.5 -left-1.5 border border-white"></div>
+                                    <h4 class="text-lg font-semibold text-slate-900">3. Salve a Lista</h4>
+                                    <p class="text-base font-normal text-slate-500">Clique na opção para salvar, dê um nome claro e uma descrição detalhada. Pronto!</p>
+                                </li>
+                            </ol>
+                        </div>
+                        <div class="bg-stone-50 border border-slate-200 rounded-lg p-6">
+                            <h3 class="font-bold text-xl mb-3 text-slate-800">Dicas de Organização</h3>
+                            <div class="space-y-4">
+                                <div>
+                                    <h4 class="font-semibold">Nomenclatura Estratégica</h4>
+                                    <p class="text-slate-600 text-sm">Use um padrão claro para nomear suas listas. Ex: `AREA_CARGO_NIVEL_LOCAL_DATA`.</p>
+                                    <code class="text-xs bg-slate-200 p-1 rounded">DEV_BACKEND_PLENO_REMOTO_2024-09</code>
+                                </div>
+                                 <div>
+                                    <h4 class="font-semibold">Use a Descrição</h4>
+                                    <p class="text-slate-600 text-sm">Cole a string booleana ou os filtros usados na descrição. Isso serve como um registro valioso para o futuro.</p>
+                                </div>
+                                 <div>
+                                    <h4 class="font-semibold">Higiene e Manutenção</h4>
+                                    <p class="text-slate-600 text-sm">As listas não são estáticas. Revise-as periodicamente (ex: a cada trimestre) para garantir que continuam relevantes. Arquive ou exclua listas obsoletas.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="atribuir" class="content-section">
+                 <div class="bg-white p-6 md:p-8 rounded-xl shadow-sm">
+                    <h2 class="text-2xl font-bold text-teal-700 mb-4">Atribuindo Talentos a Vagas</h2>
+
+                    <p class="text-slate-600 mb-6">Este é o núcleo da estratégia: mover talentos da sua lista para uma vaga específica de forma interna. Esta seção detalha o fluxo de "curadoria silenciosa" e esclarece visualmente as diferenças cruciais entre as ações de atribuição na plataforma.</p>
+                    
+                    <div class="mb-8">
+                        <h3 class="font-bold text-xl mb-3 text-slate-800">Fluxo de Atribuição Direta</h3>
+                        <div class="grid grid-cols-2 md:grid-cols-5 gap-4 text-center">
+                            <div class="flex flex-col items-center">
+                                <div class="flex items-center justify-center w-12 h-12 bg-teal-100 text-teal-700 rounded-full text-xl font-bold mb-2">1</div>
+                                <p class="text-sm text-slate-600">Acesse sua lista segmentada.</p>
+                            </div>
+                             <div class="flex flex-col items-center">
+                                <div class="flex items-center justify-center w-12 h-12 bg-teal-100 text-teal-700 rounded-full text-xl font-bold mb-2">2</div>
+                                <p class="text-sm text-slate-600">Selecione os candidatos desejados.</p>
+                            </div>
+                             <div class="flex flex-col items-center">
+                                <div class="flex items-center justify-center w-12 h-12 bg-teal-100 text-teal-700 rounded-full text-xl font-bold mb-2">3</div>
+                                <p class="text-sm text-slate-600">Clique na ação "Atribuir à outra vaga".</p>
+                            </div>
+                             <div class="flex flex-col items-center">
+                                <div class="flex items-center justify-center w-12 h-12 bg-teal-100 text-teal-700 rounded-full text-xl font-bold mb-2">4</div>
+                                <p class="text-sm text-slate-600">Escolha a vaga de destino.</p>
+                            </div>
+                             <div class="flex flex-col items-center">
+                                <div class="flex items-center justify-center w-12 h-12 bg-teal-100 text-teal-700 rounded-full text-xl font-bold mb-2">5</div>
+                                <p class="text-sm text-slate-600">Confirme. Os perfis estão na vaga, sem e-mails enviados!</p>
+                            </div>
+                        </div>
+                    </div>
+                 </div>
+            </section>
+        </main>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const tabs = document.querySelectorAll('.tab-button');
+            const contentSections = document.querySelectorAll('.content-section');
+
+            function switchTab(tabId) {
+                tabs.forEach(tab => {
+                    tab.classList.toggle('active', tab.dataset.tab === tabId);
+                });
+
+                contentSections.forEach(section => {
+                    section.classList.toggle('active', section.id === tabId);
+                });
+            }
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => switchTab(tab.dataset.tab));
+            });
+
+            switchTab('fundamentos');
+
+            const queryDisplay = document.getElementById('query-display');
+            const cursor = document.getElementById('cursor');
+            const explanationText = document.getElementById('explanation-text');
+            const booleanButtons = document.querySelectorAll('.boolean-btn');
+            const clearButton = document.getElementById('clear-query');
+            let currentQuery = '';
+
+            const explanations = {
+                "AND": "Refina a busca. Exige que os termos de ambos os lados estejam presentes.",
+                "OR": "Amplia a busca. Exige que pelo menos um dos termos esteja presente.",
+                "NOT": "Exclui um termo. Retorna resultados com o primeiro termo, mas sem o segundo.",
+                '""': "Busca por uma frase exata. Essencial para cargos com mais de uma palavra.",
+                "()": "Agrupa lógicas. Permite criar consultas complexas combinando operadores.",
+                "cargo:": "Busca apenas no campo 'cargo' do perfil.",
+                "cidade:": "Busca apenas no campo 'cidade'.",
+                "habilidade:": "Busca apenas no campo 'habilidade'.",
+                "empresa:": "Busca apenas no campo 'empresa'.",
+                "default": "Construa uma busca para ver a explicação."
+            };
+
+            function updateQuery(value, explanationKey) {
+                currentQuery += value;
+                queryDisplay.textContent = currentQuery;
+                explanationText.textContent = explanations[explanationKey] || explanations["default"];
+                cursor.style.display = currentQuery ? 'inline-block' : 'none';
+            }
+
+            booleanButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const value = button.dataset.value;
+                    const explanationKey = value.trim();
+                    updateQuery(value, explanationKey);
+                });
+            });
+
+            clearButton.addEventListener('click', () => {
+                currentQuery = '';
+                queryDisplay.textContent = '';
+                explanationText.textContent = 'Comece a construir sua busca clicando nos botões acima.';
+                cursor.style.display = 'inline-block';
+            });
+            
+            updateQuery('', 'default');
+
+            const ctx = document.getElementById('comparisonChart').getContext('2d');
+            const comparisonChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Notificação Automática ao Candidato?', 'Transferência de Testes/Vídeos?', 'Ação Requerida do Candidato?'],
+                    datasets: [{
+                        label: 'Atribuir do Banco de Talentos',
+                        data: [0, 0, 1],
+                        backgroundColor: '#38bdf8', // sky-400
+                        borderColor: '#0ea5e9', // sky-500
+                        borderWidth: 1
+                    }, {
+                        label: 'Transferir Entre Vagas Ativas',
+                        data: [1, 0, 0],
+                        backgroundColor: '#f87171', // red-400
+                        borderColor: '#ef4444', // red-500
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            display: false,
+                            max: 1.1,
+                            beginAtZero: true,
+                        },
+                        y: {
+                            ticks: {
+                                callback: function(value, index, values) {
+                                    const label = this.getLabelForValue(value);
+                                    return label.length > 25 ? label.substring(0, 25) + '...' : label;
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Resultado da Ação (Barra curta = Não, Barra longa = Sim)'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    const value = context.raw;
+                                    label += (value === 1) ? 'Sim' : 'Não';
+                                    return label;
+                                },
+                                afterLabel: function(context) {
+                                    let details = '';
+                                    if (context.dataset.label.includes('Atribuir')) {
+                                        if (context.label.includes('Notificação')) details = 'Ideal para curadoria interna e silenciosa.';
+                                        else if (context.label.includes('Testes')) details = 'Candidato precisa realizar as etapas da nova vaga.';
+                                        else if (context.label.includes('Ação')) details = 'Precisa confirmar a candidatura para se tornar ativo.';
+                                    } else {
+                                         if (context.label.includes('Notificação')) details = 'Candidato é informado da movimentação.';
+                                         else if (context.label.includes('Testes')) details = 'Etapas não são transferidas.';
+                                         else if (context.label.includes('Ação')) details = 'Movimentação gerenciada pelo recrutador.';
+                                    }
+                                    return details;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>
